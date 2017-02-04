@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.2
+# Version:      0.0.3
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -123,7 +123,7 @@ handle_quiz () {
         echo ""
         echo "$question" |fmt -w 80
         echo ""
-        correct=`echo "$line" |cut -f2 -d'|' |sed 's/[ ,\,]//g' |tr "[:upper:]" "[:lower:]"`
+        correct=`echo "$line" |cut -f2 -d'|' |sed 's/[ ,\,]//g' |tr "[:upper:]" "[:lower:]" |grep -o . | sort |tr -d "\n"`
         answer=""
         for counter in $(seq 1 ${#correct}); do
           char=${correct:counter-1:1}
@@ -166,7 +166,7 @@ handle_quiz () {
         fi
         echo ""
         read -p "Answer? " -n$chars response
-        response=`echo "$response" | tr "[:upper:]" "[:lower:]"`
+        response=`echo "$response" | tr "[:upper:]" "[:lower:]" |grep -o . | sort |tr -d "\n"`
         if [ "$response" = "q" ]; then
           print_results $no_questions $no_correct $no_wrong
           exit

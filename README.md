@@ -8,7 +8,7 @@ Command Line Quiz
 Introduction
 ------------
 
-A Simple shell script that converts a formatted CSV file into a multiple choice quiz.
+A simple shell script that converts a formatted CSV file into a multiple choice quiz.
 
 Supported Operating Systems
 ---------------------------
