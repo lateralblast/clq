@@ -27,6 +27,8 @@ Features
 
 Some of the features:
 
+- Doesn't wait for enter key to be pressed increasing speed users can go through questions
+- Responds with correct answer, coloring the text green if the answer was correct or red if it wasn't
 - Has support for multiple answer questions (i.e. choose to or more correct answers)
 - Keeps track of correct and wrong answers providing a tally at the end
 - Allows quiting at anytime with 'q'
