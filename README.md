@@ -32,11 +32,11 @@ Some of the features:
 - Has support for multiple answer questions (i.e. choose to or more correct answers)
 - Keeps track of correct and wrong answers providing a tally at the end
 - Allows quiting at anytime with 'q'
+- Ability to ask questions in random order
 
 Possible future features:
 
 - Better answer input handing
-- Randomising order of questions
 - Randomising choices
 - Support for opposite choice questions (i.e. chose two or more wrong answers)
 
@@ -69,6 +69,11 @@ Do the multiple choice quiz example:
 $ ./clq.sh -q example
 ```
 
+Ask questions in random order:
+
+```
+$ ./clq.sh -r example
+```
 
 Question File Information
 -------------------------

@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.1
+# Version:      0.0.2
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -46,7 +46,8 @@ print_usage () {
   echo ""
   echo "-h:        Print usage"
   echo "-V:        Print version"
-  echo "-q [quiz]: Quiz"
+  echo "-q [quiz]: Quiz (ask questions in sequential order)"
+  echo "-r [quiz]: Quiz (ask questions in random order)"
   echo ""
 }
 
@@ -91,6 +92,7 @@ print_results () {
 
 handle_quiz () {
   quiz_file=$1
+  random=$2
   printf $text_white
   if [ ! -f "$quiz_file" ]; then
     orig_file="$quiz_file"
@@ -103,16 +105,21 @@ handle_quiz () {
   no_questions=0
   no_correct=0
   no_wrong=0
+  header=`cat $quiz_file |grep "^Question"`
+  header_a=`echo "$header" |cut -f3 -d'|'`
+  header_b=`echo "$header" |cut -f4 -d'|'`
+  header_c=`echo "$header" |cut -f5 -d'|'`
+  header_d=`echo "$header" |cut -f6 -d'|'`
+  header_e=`echo "$header" |cut -f7 -d'|'`
+  if [ "$random" -eq 1 ]; then
+    quiz_data=`cat $quiz_file |awk 'BEGIN{srand();} {printf "%06d %s\n", rand()*1000000, $0;}' | sort -n | cut -c8-`
+  else
+    quiz_data=`cat $quiz_file`
+  fi
   while read -r line <&3; do
     if [ ! "$line" = "" ]; then
       question=`echo "$line" |cut -f1 -d'|'`
-      if [ "$question" = "Question" ]; then
-        header_a=`echo "$line" |cut -f3 -d'|'`
-        header_b=`echo "$line" |cut -f4 -d'|'`
-        header_c=`echo "$line" |cut -f5 -d'|'`
-        header_d=`echo "$line" |cut -f6 -d'|'`
-        header_e=`echo "$line" |cut -f7 -d'|'`
-      else
+      if [ ! "$question" = "Question" ]; then
         echo ""
         echo "$question" |fmt -w 80
         echo ""
@@ -178,19 +185,26 @@ handle_quiz () {
         echo ""
       fi
     fi
-  done 3< "$quiz_file"
+  done 3<<< "$quiz_data"
   print_results $no_questions $no_correct $no_wrong
 }
 
-
-while getopts hlVq: args; do
+while getopts hlrVq: args; do
   case $args in
     l)
       list_quizes
       ;;
+    r)
+      quiz_file=$2
+      random=1
+      handle_quiz $quiz_file $random
+      exit
+      ;;
     q)
       quiz_file=$2
-      handle_quiz $quiz_file
+      random=0
+      handle_quiz $quiz_file $random
+      exit
       ;;
     h)
       print_usage
