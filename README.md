@@ -52,7 +52,8 @@ Usage: ./clq.sh -[h|V|q] [quiz]
 
 -h:        Print usage
 -V:        Print version
--q [quiz]: Quiz
+-q [quiz]: Quiz (ask questions in sequential order)
+-r [quiz]: Quiz (ask questions in random order)
 ```
 
 List available quizes:
