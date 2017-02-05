@@ -97,6 +97,20 @@ Usage: ./clq.rb
 "--version",  "-V"  Print version information
 ```
 
+List available quizes:
+
+```
+$ ./clq.rb -l
+Available quizes:
+example
+```
+
+Do the multiple choice quiz example:
+
+```
+$ ./clq.rb -q example
+```
+
 Question File Information
 -------------------------
 
