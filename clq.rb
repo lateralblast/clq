@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.4
+# Version:      0.0.5
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -141,6 +141,9 @@ def handle_quiz(quiz_file,random)
     end
   end
   quiz_data = SmarterCSV.process(quiz_file,:col_sep => "|")
+  if random == true
+    quiz_data = quiz_data.shuffle
+  end
   quiz_data.each do |key, value|
     answer   = ""
     no_quest = no_quest + 1
@@ -169,6 +172,10 @@ def handle_quiz(quiz_file,random)
     response = ""
     while response.length < correct.length
       input = STDIN.getch.chomp.downcase.gsub(/,| /,"").chars.sort.join
+      if input.match(/q/)
+        print_results(no_quest,no_right,no_wrong)
+        exit
+      end
       response = response+input
     end
     puts
@@ -192,7 +199,7 @@ include Getopt
 begin
   option = Long.getopts(
     [ "--list",    "-l", BOOLEAN ],  # List quizes
-    [ "--random",  "-r", BOOLEAN ],  # Randomise quizes
+    [ "--random",  "-r", REQUIRED ],  # Randomise quizes
     [ "--quiz",    "-q", REQUIRED ], # Quiz
     [ "--help",    "-h", BOOLEAN ],  # Print help information
     [ "--version", "-V", BOOLEAN ]   # Print version information
