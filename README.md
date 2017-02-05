@@ -8,12 +8,16 @@ Command Line Quiz
 Introduction
 ------------
 
-A simple shell script that converts a formatted CSV file into a multiple choice quiz.
+A simple shell and ruby script that converts a formatted CSV file into a multiple choice quiz.
+
+Shell script: clq.sh
+
+Ruby script: clq.rb
 
 Supported Operating Systems
 ---------------------------
 
-Any operating system with sh/bash
+Any operating system with sh/bash or ruby
 
 License
 -------
@@ -40,8 +44,8 @@ Possible future features:
 - Randomising choices
 - Support for opposite choice questions (i.e. chose two or more wrong answers)
 
-Usage Information
------------------
+Shell Script Usage Information
+------------------------------
 
 Get help:
 
@@ -74,6 +78,23 @@ Ask questions in random order:
 
 ```
 $ ./clq.sh -r example
+```
+
+Ruby Script Usage Information
+-----------------------------
+
+Get help:
+
+```
+$ ./clq.rb -h
+
+Usage: ./clq.rb
+
+"--list",			"-l"	List quizes
+"--random",		"-r"	Randomise quizes
+"--quiz",			"-q"	Quiz
+"--help",			"-h"	Print help information
+"--version",	"-V"	Print version information
 ```
 
 Question File Information
