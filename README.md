@@ -90,11 +90,11 @@ $ ./clq.rb -h
 
 Usage: ./clq.rb
 
-"--list",			"-l"	List quizes
-"--random",		"-r"	Randomise quizes
-"--quiz",			"-q"	Quiz
-"--help",			"-h"	Print help information
-"--version",	"-V"	Print version information
+"--list",     "-l"  List quizes
+"--random",   "-r"  Randomise quizes
+"--quiz",     "-q"  Quiz
+"--help",     "-h"  Print help information
+"--version",  "-V"  Print version information
 ```
 
 Question File Information
