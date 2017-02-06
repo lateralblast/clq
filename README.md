@@ -47,7 +47,7 @@ Shell Script Usage Information
 
 Get help:
 
-```
+```ShellSession
 $ ./clq.sh -h
 
 Usage: ./clq.sh -[h|V|q] [quiz]
