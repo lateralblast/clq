@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.6
+# Version:      0.0.7
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -26,7 +26,7 @@ end
 begin
   require 'getopt/long'
 rescue LoadError
-  install_gem("getopt","getopt/long")
+  install_gem("getopt/long","getopt")
 end
 begin
   require 'smarter_csv'
@@ -38,6 +38,17 @@ begin
 rescue LoadError
   install_gem('colorize','colorize')
 end
+
+class String
+  def wrap_text(col = 80)
+    gsub(/(.{1,#{col}})( +|$)\n?|(.{#{col}})/,"\\1\\3\n")
+  end
+  def wrap_text_with_indent(col = 80, indent = "   ")
+    gsub(/(.{1,#{col}})( +|$)\n?|(.{#{col}})/,"\\1\\3\n#{indent}")
+  end
+end
+
+include Getopt
 
 # Set some defaults
 
@@ -112,17 +123,20 @@ end
 # Print results
 
 def print_results(no_quest,no_right,no_wrong)
-  percent = ( no_right.to_f / no_quest.to_f ) * 100
-  percent = percent.round(1)
+  if no_quest != 0
+    percent = ( no_right.to_f / no_quest.to_f ) * 100
+    percent = percent.round(1)
+    puts ""
+    puts ""
+    puts "Results:"
+    puts ""
+    puts "Questions: "+no_quest.to_s
+    puts "Correct:   "+no_right.to_s
+    puts "Wrong:     "+no_wrong.to_s
+    puts "Percent:   "+percent.to_s+"%"
+  end
   puts ""
-  puts ""
-  puts "Results:"
-  puts ""
-  puts "Questions: "+no_quest.to_s
-  puts "Correct:   "+no_right.to_s
-  puts "Wrong:     "+no_wrong.to_s
-  puts "Percent:   "+percent.to_s+"%"
-  puts ""
+  return
 end
 
 # Handle quizes
@@ -148,8 +162,10 @@ def handle_quiz(quiz_file,random)
     r_correct = []
     answer    = ""
     correct   = key[:answer].downcase.gsub(/,| /,"").chars.sort.join
+    question  = key[:question]
+    question  = question.wrap_text
     puts
-    puts key[:question]
+    puts question
     puts
     if random == true
       rand_order = [ 'a', 'b', 'c', 'd', 'e' ].shuffle
@@ -165,7 +181,7 @@ def handle_quiz(quiz_file,random)
               answer = answer+" - "+choice.upcase+": "+key[:"#{letter}"]
             end
           end
-          puts choice.upcase+": "+key[:"#{letter}"]
+          puts choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
         end
       end
       correct = r_correct.join
@@ -179,7 +195,7 @@ def handle_quiz(quiz_file,random)
               answer = answer+" - "+letter.upcase+": "+key[:"#{letter}"]
             end
           end
-          puts letter.upcase+": "+key[:"#{letter}"]
+          puts letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
         end
       end
     end
@@ -188,11 +204,14 @@ def handle_quiz(quiz_file,random)
     response = ""
     while response.length < correct.length
       input = STDIN.getch.chomp.downcase.gsub(/,| /,"").chars.sort.join
+      print input
       if input.match(/q/)
         print_results(no_quest,no_right,no_wrong)
         exit
       end
-      response = response+input
+      if input.match(/[a-e]/)
+        response = response+input
+      end
     end
     puts
     puts
@@ -206,11 +225,10 @@ def handle_quiz(quiz_file,random)
     end
   end
   print_results(no_quest,no_right,no_wrong)
+  return
 end
 
 # Process options
-
-include Getopt
 
 begin
   option = Long.getopts(

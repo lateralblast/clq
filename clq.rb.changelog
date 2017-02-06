@@ -10,3 +10,5 @@
 # Added random order capability and quit function like shell script
 # 0.0.6: Mon  6 Feb 2017 12:10:49 AEDT
 # Added random order to choices within question
+# 0.0.7: Mon  6 Feb 2017 13:07:45 AEDT
+# Added word wrap and indentation
