@@ -47,7 +47,7 @@ Shell Script Usage Information
 
 Get help:
 
-```console
+```
 $ ./clq.sh -h
 
 Usage: ./clq.sh -[h|V|q] [quiz]
@@ -162,7 +162,7 @@ Available quizes:
 example
 ```
 
-Do the multiple choice quiz example:
+Do the multiple choice quiz example in random order and mix choices amongst questions:
 
 ```
 $ ./clq.rb -q example -m -r
