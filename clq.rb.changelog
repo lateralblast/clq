@@ -8,3 +8,5 @@
 # Initial ruby version
 # 0.0.5: Mon  6 Feb 2017 10:28:08 AEDT
 # Added random order capability and quit function like shell script
+# 0.0.6: Mon  6 Feb 2017 12:10:49 AEDT
+# Added random order to choices within question

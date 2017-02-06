@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.5
+# Version:      0.0.6
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -145,26 +145,42 @@ def handle_quiz(quiz_file,random)
     quiz_data = quiz_data.shuffle
   end
   quiz_data.each do |key, value|
-    answer   = ""
-    no_quest = no_quest + 1
-    correct  = key[:answer].downcase.gsub(/,| /,"").chars.sort.join
-    if correct.length == 1
-      answer = correct.upcase+": "+key[:"#{correct}"]
-    else
-      correct.split("").each_with_index do |letter, index|
-        if index == 0
-          answer = letter.upcase+": "+key[:"#{letter}"]
-        else
-          answer = answer+" - "+letter.upcase+": "+key[:"#{letter}"]
-        end
-      end
-    end
+    r_correct = []
+    answer    = ""
+    correct   = key[:answer].downcase.gsub(/,| /,"").chars.sort.join
     puts
     puts key[:question]
     puts
-    [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
-      if key[:"#{letter}"]
-        puts letter.upcase+": "+key[:"#{letter}"]
+    if random == true
+      rand_order = [ 'a', 'b', 'c', 'd', 'e' ].shuffle
+      rand_order.each_with_index do |letter, index|
+        if key[:"#{letter}"]
+          choice = "a".ord+index
+          choice = choice.chr
+          if correct.match(/#{letter}/)
+            r_correct.push(choice)
+            if answer.length < 1
+              answer = choice.upcase+": "+key[:"#{letter}"]
+            else
+              answer = answer+" - "+choice.upcase+": "+key[:"#{letter}"]
+            end
+          end
+          puts choice.upcase+": "+key[:"#{letter}"]
+        end
+      end
+      correct = r_correct.join
+    else
+      [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
+        if key[:"#{letter}"]
+          if correct.match(/#{letter}/)
+            if answer.length < 1
+              answer = letter.upcase+": "+key[:"#{letter}"]
+            else
+              answer = answer+" - "+letter.upcase+": "+key[:"#{letter}"]
+            end
+          end
+          puts letter.upcase+": "+key[:"#{letter}"]
+        end
       end
     end
     puts
@@ -180,6 +196,7 @@ def handle_quiz(quiz_file,random)
     end
     puts
     puts
+    no_quest = no_quest + 1
     if response == correct
       no_right = no_right + 1
       puts answer.green
@@ -187,7 +204,6 @@ def handle_quiz(quiz_file,random)
       no_wrong = no_wrong + 1
       puts answer.red
     end
-    puts
   end
   print_results(no_quest,no_right,no_wrong)
 end
