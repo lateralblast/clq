@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.8
+# Version:      0.0.9
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -169,6 +169,7 @@ def handle_quiz(quiz_file,random,mix)
   quiz_data.each do |key, value|
     r_correct = []
     answer    = ""
+    text      = ""
     correct   = key[:answer].downcase.gsub(/,| /,"").chars.sort.join
     question  = key[:question]
     question  = question.wrap_text
@@ -183,19 +184,28 @@ def handle_quiz(quiz_file,random,mix)
           choice  = choice.chr
           counter = counter + 1
           line    = ""
+          test = 0
+          line = ""
+          text = ""
           if correct.match(/#{letter}/)
             r_correct.push(choice)
             if answer.length < 1
               answer = choice.upcase+": "+key[:"#{letter}"]
             else
-              answer = answer+" - "+choice.upcase+": "+key[:"#{letter}"]
+              answer = answer+"\n"+choice.upcase+": "+key[:"#{letter}"]
             end
             line = choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
           else
             if mix == true
               text = q_mix.sample
-              while text.match(/key[:"#{letter}"]/)
+              while test == 0
+                test = 1
                 text = q_mix.sample
+                correct.split("").each do |sample|
+                  if key[:"#{sample}"].match(/#{text}/) or key[:"#{letter}"].match(/#{text}/) or key[:"#{choice}"].match(/#{text}/)
+                    test = 0
+                  end
+                end
               end
               line = choice.upcase.bold+": "+text.wrap_text_with_indent
             else 
@@ -208,20 +218,28 @@ def handle_quiz(quiz_file,random,mix)
       correct = r_correct.join
     else
       [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
+        test = 0
         line = ""
+        text = ""
         if key[:"#{letter}"]
           if correct.match(/#{letter}/)
             if answer.length < 1
               answer = letter.upcase+": "+key[:"#{letter}"]
             else
-              answer = answer+" - "+letter.upcase+": "+key[:"#{letter}"]
+              answer = answer+"\n"+letter.upcase+": "+key[:"#{letter}"]
             end
             line = letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
           else
             if mix == true
               text = q_mix.sample
-              while text.match(/key[:"#{letter}"]/)
+              while test == 0
+                test = 1
                 text = q_mix.sample
+                correct.split("").each do |sample|
+                  if key[:"#{sample}"].match(/#{text}/) or key[:"#{letter}"].match(/#{text}/)
+                    test = 0
+                  end
+                end
               end
               line = letter.upcase.bold+": "+text.wrap_text_with_indent
             else
@@ -248,6 +266,7 @@ def handle_quiz(quiz_file,random,mix)
     end
     puts
     puts
+    answer = answer.wrap_text
     no_quest = no_quest + 1
     if response == correct
       no_right = no_right + 1

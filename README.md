@@ -165,56 +165,75 @@ example
 Do the multiple choice quiz example:
 
 ```
-$ ./clq.sh -q example
-
-Amazon Glacier is designed for: (Choose 2 answers)
-
-A: active database storage.
-B: infrequently accessed data.
-C: data archives.
-D: frequently accessed data.
-E: cached session data.
-
-Answer? bc
-
-B - infrequently accessed data. C - data archives.
+$ ./clq.rb -q example -m -r
 
 Your web application front end consists of multiple EC2 instances behind an
 Elastic Load Balancer. You configured ELB to perform health checks on these EC2
 instances. If an instance fails to pass health checks, which statement will be
 true?
 
-A: The instance is replaced automatically by the ELB.
-B: The instance gets terminated automatically by the ELB.
-C: The ELB stops sending traffic to the instance that failed its health check.
-D: The instance gets quarantined by the ELB for root cause analysis.
+A: The instance gets quarantined by the ELB for root cause analysis.
 
-Answer? g
+B: Create an Origin Access Identity (OAI) for CloudFront and grant access to the
+   objects in your S3 bucket to that OAI.
 
-C - The ELB stops sending traffic to the instance that failed its health check.
+C: The instance gets terminated automatically by the ELB.
+
+D: The ELB stops sending traffic to the instance that failed its health check.
+
+
+Answer? d
+
+D: The ELB stops sending traffic to the instance that failed its health check.
+
 
 You are building a system to distribute confidential training videos to
 employees. Using CloudFront, what method could be used to serve content that is
 stored in S3, but not publically accessible from S3 directly?
 
-A: Create an Origin Access Identity (OAI) for CloudFront and grant access to the
+A: cached session data.
+
+B: active database storage.
+
+C: Create an Origin Access Identity (OAI) for CloudFront and grant access to the
+   objects in your S3 bucket to that OAI.
+
+D: The instance gets quarantined by the ELB for root cause analysis.
+
+
+Answer? c
+
+C: Create an Origin Access Identity (OAI) for CloudFront and grant access to the
 objects in your S3 bucket to that OAI.
-B: Add the CloudFront account security group “amazon-cf/amazon-cf-sg” to the
-appropriate S3 bucket policy.
-C: Create an Identity and Access Management (IAM) User for CloudFront and grant
-access to the objects in your S3 bucket to that IAM User.
-D: Create a S3 bucket policy that lists the CloudFront distribution ID as the
-Principal and the target bucket as the Amazon Resource Name (ARN).
 
-Answer? g
 
-A - Create an Origin Access Identity (OAI) for CloudFront and grant access to the objects in your S3 bucket to that OAI.
+Amazon Glacier is designed for: (Choose 2 answers)
+
+A: Create an Identity and Access Management (IAM) User for CloudFront and grant
+   access to the objects in your S3 bucket to that IAM User.
+
+B: infrequently accessed data.
+
+C: Create a S3 bucket policy that lists the CloudFront distribution ID as the
+   Principal and the target bucket as the Amazon Resource Name (ARN).
+
+D: data archives.
+
+E: Create an Origin Access Identity (OAI) for CloudFront and grant access to the
+   objects in your S3 bucket to that OAI.
+
+
+Answer? bd
+
+B: infrequently accessed data.
+D: data archives.
+
 
 
 Results:
 
 Questions: 3
-Correct:   1
-Wrong:     2
-Percent:   33%
+Correct:   3
+Wrong:     0
+Percent:   100.0%
 ```
