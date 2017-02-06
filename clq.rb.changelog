@@ -12,3 +12,5 @@
 # Added random order to choices within question
 # 0.0.7: Mon  6 Feb 2017 13:07:45 AEDT
 # Added word wrap and indentation
+# 0.0.8: Mon  6 Feb 2017 13:58:14 AEDT
+# Added ability to mix choices up between questions

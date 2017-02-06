@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.7
+# Version:      0.0.8
 # Release:      1
 # License:      CC-BA (Creative Commons By Attribution)
 #               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -141,7 +141,7 @@ end
 
 # Handle quizes
 
-def handle_quiz(quiz_file,random)
+def handle_quiz(quiz_file,random,mix)
   no_right = 0
   no_wrong = 0
   no_quest = 0
@@ -158,6 +158,14 @@ def handle_quiz(quiz_file,random)
   if random == true
     quiz_data = quiz_data.shuffle
   end
+  if mix == true
+    q_mix = []
+    quiz_data.each do |key, value|
+      [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
+        q_mix.push(key[:"#{letter}"])
+      end
+    end
+  end
   quiz_data.each do |key, value|
     r_correct = []
     answer    = ""
@@ -168,11 +176,13 @@ def handle_quiz(quiz_file,random)
     puts question
     puts
     if random == true
-      rand_order = [ 'a', 'b', 'c', 'd', 'e' ].shuffle
-      rand_order.each_with_index do |letter, index|
+      counter = 0
+      [ 'a', 'b', 'c', 'd', 'e' ].shuffle.each do |letter|
         if key[:"#{letter}"]
-          choice = "a".ord+index
-          choice = choice.chr
+          choice  = "a".ord+counter
+          choice  = choice.chr
+          counter = counter + 1
+          line    = ""
           if correct.match(/#{letter}/)
             r_correct.push(choice)
             if answer.length < 1
@@ -180,13 +190,25 @@ def handle_quiz(quiz_file,random)
             else
               answer = answer+" - "+choice.upcase+": "+key[:"#{letter}"]
             end
+            line = choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
+          else
+            if mix == true
+              text = q_mix.sample
+              while text.match(/key[:"#{letter}"]/)
+                text = q_mix.sample
+              end
+              line = choice.upcase.bold+": "+text.wrap_text_with_indent
+            else 
+              line = choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
+            end
           end
-          puts choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
+          puts line
         end
       end
       correct = r_correct.join
     else
       [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
+        line = ""
         if key[:"#{letter}"]
           if correct.match(/#{letter}/)
             if answer.length < 1
@@ -194,8 +216,19 @@ def handle_quiz(quiz_file,random)
             else
               answer = answer+" - "+letter.upcase+": "+key[:"#{letter}"]
             end
+            line = letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
+          else
+            if mix == true
+              text = q_mix.sample
+              while text.match(/key[:"#{letter}"]/)
+                text = q_mix.sample
+              end
+              line = letter.upcase.bold+": "+text.wrap_text_with_indent
+            else
+              line = letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
+            end
           end
-          puts letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
+          puts line
         end
       end
     end
@@ -233,7 +266,8 @@ end
 begin
   option = Long.getopts(
     [ "--list",    "-l", BOOLEAN ],  # List quizes
-    [ "--random",  "-r", REQUIRED ],  # Randomise quizes
+    [ "--random",  "-r", BOOLEAN ],  # Randomise quizes
+    [ "--mix",     "-m", BOOLEAN ],  # Mix choices between questions
     [ "--quiz",    "-q", REQUIRED ], # Quiz
     [ "--help",    "-h", BOOLEAN ],  # Print help information
     [ "--version", "-V", BOOLEAN ]   # Print version information
@@ -255,12 +289,22 @@ if option["V"]
   print_version()
 end
 
+# Ask questions in random order
+
 if option ["r"]
   random = true
-  handle_quiz(option["r"],random)
+else
+  random = false
+end
+
+# Mix choices between questions
+
+if option ["m"]
+  mix = true
+else
+  mix = false
 end
 
 if option["q"]
-  random = false
-  handle_quiz(option["q"],random)
+  handle_quiz(option["q"],random,mix)
 end

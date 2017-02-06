@@ -37,12 +37,10 @@ Some of the features:
 - Keeps track of correct and wrong answers providing a tally at the end
 - Allows quiting at anytime with 'q'
 - Ability to ask questions in random order
+- Ability to mix choices from other questions
+  - Handy for learning vocabulary where you want to mix things up and avoid pattern recognition
+  - Not necessarily handy for quiz with disparate questions types as the outliers are obvious
 
-Possible future features:
-
-- Better answer input handing
-- Randomising choices
-- Support for opposite choice questions (i.e. chose two or more wrong answers)
 
 Shell Script Usage Information
 ------------------------------
@@ -92,6 +90,7 @@ Usage: ./clq.rb
 
 "--list",     "-l"  List quizes
 "--random",   "-r"  Randomise quizes
+"--mix",      "-m"  Mix choices between questions
 "--quiz",     "-q"  Quiz
 "--help",     "-h"  Print help information
 "--version",  "-V"  Print version information
@@ -109,6 +108,18 @@ Do the multiple choice quiz example:
 
 ```
 $ ./clq.rb -q example
+```
+
+Ask questions in random order:
+
+```
+$ ./clq.rb -q example -r
+```
+
+Ask questions in random order and mix choices between questions
+
+```
+$ ./clq.rb -q example -r -m
 ```
 
 Question File Information
