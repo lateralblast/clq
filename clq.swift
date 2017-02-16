@@ -1,7 +1,7 @@
 #!/usr/bin/env xcrun swift
 
 // Name:         clq (Command Line Quiz)
-// Version:      0.0.2
+// Version:      0.0.3
 // Release:      1
 // License:      CC-BA (Creative Commons By Attribution)
 //               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -141,6 +141,7 @@ func handle_quiz(file: String, random: Int) -> Void {
   let red      = "\u{001B}[0;31m"
   let white    = "\u{001B}[0;37m"
   var lines    = file_to_array(file: file)
+  let choices  = [ "a", "b", "c", "d", "e" ]
   if random == 1 {
     lines = lines.shuffled()
   }
@@ -169,34 +170,15 @@ func handle_quiz(file: String, random: Int) -> Void {
               question    = wrap_text(text: question, indent: "")
               print("\(white)\(question)")
               print("")
-              if var choice_a = fields[2] as String? {
-                if var _ = choice_a.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                  choice_a = wrap_text(text: choice_a, indent: "   ")
-                  print("A: \(choice_a)")
-                }
-              }
-              if var choice_b = fields[3] as String? {
-                if var _ = choice_b.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                  choice_b = wrap_text(text: choice_b, indent: "   ")
-                  print("B: \(choice_b)")
-                }
-              }
-              if var choice_c = fields[4] as String? {
-                if var _ = choice_c.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                  choice_c = wrap_text(text: choice_c, indent: "   ")
-                  print("C: \(choice_c)")
-                }
-              }
-              if var choice_d = fields[5] as String? {
-                if var _ = choice_d.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                  choice_d = wrap_text(text: choice_d, indent: "   ")
-                  print("D: \(choice_d)")
-                }
-              }
-              if var choice_e = fields[6] as String? {
-                if var _ = choice_e.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                  choice_e = wrap_text(text: choice_e, indent: "   ")
-                  print("E: \(choice_e)")
+              for choice in choices {
+                let upper = String(choice).uppercased()
+                let value = String(choice).unicodeScalars.first?.value
+                var count: Int = Int(value!)
+                count      = count - 95
+                var string = fields[count]
+                if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
+                  string = wrap_text(text: string, indent: "   ")
+                  print("\(upper): \(string)")
                 }
               }
               print("")
