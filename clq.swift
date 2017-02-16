@@ -1,7 +1,7 @@
 #!/usr/bin/env xcrun swift
 
 // Name:         clq (Command Line Quiz)
-// Version:      0.0.1
+// Version:      0.0.2
 // Release:      1
 // License:      CC-BA (Creative Commons By Attribution)
 //               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -15,6 +15,21 @@
 
 import Darwin
 import Foundation
+
+extension Array {
+  func shuffled() -> [Element] {
+    var results = [Element]()
+    var indexes = (0 ..< count).map { $0 }
+    while indexes.count > 0 {
+      let indexOfIndexes = Int(arc4random_uniform(UInt32(indexes.count)))
+      let index = indexes[indexOfIndexes]
+      results.append(self[index])
+      indexes.remove(at: indexOfIndexes)
+    }
+    return results
+  }
+}
+    
 
 let script = CommandLine.arguments[0]
 
@@ -39,6 +54,7 @@ func print_usage(file: String) -> Void {
       if line.range(of: "License|regularExpression", options: .regularExpression) == nil {
         var output = line.replacingOccurrences(of: "case", with: "")
         output     = output.replacingOccurrences(of: "// ", with: "")
+        output     = output.replacingOccurrences(of: "^\\s+", with: "", options: .regularExpression)
         print(output)
       }
     }
@@ -117,14 +133,17 @@ func print_results(no_quest: Int, no_right: Int, no_wrong: Int) -> Void {
   exit(0)
 }
 
-func handle_quiz(file: String) -> Void {
+func handle_quiz(file: String, random: Int) -> Void {
   var no_quest = 0
   var no_right = 0
   var no_wrong = 0
   let green    = "\u{001B}[0;32m"
   let red      = "\u{001B}[0;31m"
   let white    = "\u{001B}[0;37m"
-  let lines    = file_to_array(file: file)
+  var lines    = file_to_array(file: file)
+  if random == 1 {
+    lines = lines.shuffled()
+  }
   for line in lines {
     if line.characters.count > 0 {
       if var _ = line.range(of: "|", options: .regularExpression) {
@@ -224,12 +243,27 @@ switch argument {
   case "l", "-l": // List Quizes
     list_quizes()
   case "q", "-q": // Perform quiz
-    if CommandLine.arguments.count == 3 {
-      var quiz = CommandLine.arguments[2]
+    if CommandLine.arguments.count > 2 {
+      var quiz   = CommandLine.arguments[2]
+      var random = 0
       if quiz.range(of: "quizes/", options: .regularExpression) == nil {
         quiz = "quizes/\(quiz)"
       }
-      handle_quiz(file: quiz)
+      if CommandLine.arguments.count == 4 {
+        let mode = CommandLine.arguments[3] 
+        switch mode {
+          case "s", "-s", "--shuffle":
+            random = 1
+          case "r", "-r", "--random":
+            random = 2
+          default:
+            random = 0
+        }
+      }
+      else {
+        random = 0
+      }
+      handle_quiz(file: quiz, random: random)
     }
     else {
       print("No quiz specified")
