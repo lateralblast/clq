@@ -1,7 +1,7 @@
 #!/usr/bin/env xcrun swift
 
 // Name:         clq (Command Line Quiz)
-// Version:      0.0.3
+// Version:      0.0.4
 // Release:      1
 // License:      CC-BA (Creative Commons By Attribution)
 //               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -141,9 +141,11 @@ func handle_quiz(file: String, random: Int) -> Void {
   let red      = "\u{001B}[0;31m"
   let white    = "\u{001B}[0;37m"
   var lines    = file_to_array(file: file)
-  let choices  = [ "a", "b", "c", "d", "e" ]
+  var choices  = [ "a", "b", "c", "d", "e" ]
+  var q_mix    = [String]()
   if random == 1 {
-    lines = lines.shuffled()
+    choices = choices.shuffled()
+    lines   = lines.shuffled()
   }
   for line in lines {
     if line.characters.count > 0 {
@@ -151,35 +153,72 @@ func handle_quiz(file: String, random: Int) -> Void {
         if let fields = line.components(separatedBy: "|") as [String]? {
           if var question = fields[0] as String? {
             if question != "Question" {
-              var answer  = fields[1]
-              answer      = sort_answer(text: answer)
-              answer      = answer.lowercased()
-              var array   = [String]()
-              let letters = Array(answer.characters)
+              var correct  = String()
+              var answer   = String()
+              var counter  = 0
+              var t_answer = fields[1]
+              t_answer     = sort_answer(text: t_answer)
+              t_answer     = t_answer.lowercased()
+              var array    = [String]()
+              let letters  = Array(t_answer.characters)
               for letter in letters {
                 let upper = String(letter).uppercased()
                 let value = String(letter).unicodeScalars.first?.value
                 var count: Int = Int(value!)
                 count      = count - 95
                 var string = fields[count]
+                q_mix.append(string)
                 string     = "\(upper): \(string)"
                 string     = wrap_text(text: string, indent: "   ")
                 array.append(string)
               }
-              let correct = array.map({String(describing: $0)}).joined(separator: "")
-              question    = wrap_text(text: question, indent: "")
+              let t_correct = array.map({String(describing: $0)}).joined(separator: "")
+              question      = wrap_text(text: question, indent: "")
               print("\(white)\(question)")
               print("")
-              for choice in choices {
-                let upper = String(choice).uppercased()
-                let value = String(choice).unicodeScalars.first?.value
-                var count: Int = Int(value!)
-                count      = count - 95
-                var string = fields[count]
-                if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                  string = wrap_text(text: string, indent: "   ")
-                  print("\(upper): \(string)")
-                }
+              switch random {
+                case 1: 
+                  var r_answer  = [String]()
+                  var r_correct = [String]()
+                  for choice in choices {
+                    let number: Int = 65 + counter
+                    let letter = String(format: "%c", number) as String
+                    let value  = String(choice).unicodeScalars.first?.value
+                    var count: Int = Int(value!)
+                    count       = count - 95
+                    var string  = fields[count]
+                    let c_array = Array(t_answer.characters)
+                    if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
+                      for temp in c_array {
+                        if String(temp).lowercased() == String(choice).lowercased() {
+                          r_answer.append(String(letter).lowercased())
+                          var r_string = "\(letter) \(string)"
+                          r_string     = wrap_text(text: r_string, indent: "   ")
+                          r_correct.append(r_string)
+                        }
+                      }
+                      string = wrap_text(text: string, indent: "   ")
+                      print("\(letter): \(string)")
+                      counter = counter + 1
+                    }
+                  }
+                  r_answer    = r_answer.sorted { $0 < $1 }
+                  answer  = r_answer.map({String(describing: $0)}).joined(separator: "")
+                  correct = r_correct.map({String(describing: $0)}).joined(separator: "")
+                default:
+                  for choice in choices {
+                    let upper = String(choice).uppercased()
+                    let value = String(choice).unicodeScalars.first?.value
+                    var count: Int = Int(value!)
+                    count      = count - 95
+                    var string = fields[count]
+                    if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
+                      string = wrap_text(text: string, indent: "   ")
+                      print("\(upper): \(string)")
+                    }
+                  }
+                  correct = t_correct
+                  answer  = t_answer
               }
               print("")
               print("Answer: ", terminator: "")

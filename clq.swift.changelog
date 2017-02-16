@@ -4,4 +4,6 @@
 # Added shuffle mode for questions
 # 0.0.3: Thu 16 Feb 2017 14:31:44 AEDT
 # Improved code for cycling through choices
+# 0.0.4: Thu 16 Feb 2017 17:35:47 AEDT
+# Added shuffling of choices in questions
 
