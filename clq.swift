@@ -1,7 +1,7 @@
 #!/usr/bin/env xcrun swift
 
 // Name:         clq (Command Line Quiz)
-// Version:      0.0.4
+// Version:      0.0.5
 // Release:      1
 // License:      CC-BA (Creative Commons By Attribution)
 //               http://creativecommons.org/licenses/by/4.0/legalcode
@@ -27,6 +27,10 @@ extension Array {
       indexes.remove(at: indexOfIndexes)
     }
     return results
+  }
+  func sample() -> Element {
+    let randomIndex = Int(arc4random()) % count
+    return self[randomIndex]
   }
 }
     
@@ -141,11 +145,38 @@ func handle_quiz(file: String, random: Int) -> Void {
   let red      = "\u{001B}[0;31m"
   let white    = "\u{001B}[0;37m"
   var lines    = file_to_array(file: file)
+  if lines.count < 1 {
+    print("")
+    print("Quiz contains no questions")
+    print("")
+    exit(0)
+  }  
   var choices  = [ "a", "b", "c", "d", "e" ]
+  let f_nos    = [ 2, 3, 4, 5, 6 ]
   var q_mix    = [String]()
-  if random == 1 {
+  if random > 0 {
     choices = choices.shuffled()
     lines   = lines.shuffled()
+  }
+  if random == 2 {
+    for line in lines {
+      if line.characters.count > 0 {
+        if var _ = line.range(of: "|", options: .regularExpression) {
+          if let fields = line.components(separatedBy: "|") as [String]? {
+            if let question = fields[0] as String? {
+              if question != "Question" {
+                for f_no in f_nos {
+                  let string = fields[f_no]
+                  if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
+                    q_mix.append(string)
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
   for line in lines {
     if line.characters.count > 0 {
@@ -167,7 +198,6 @@ func handle_quiz(file: String, random: Int) -> Void {
                 var count: Int = Int(value!)
                 count      = count - 95
                 var string = fields[count]
-                q_mix.append(string)
                 string     = "\(upper): \(string)"
                 string     = wrap_text(text: string, indent: "   ")
                 array.append(string)
@@ -177,34 +207,53 @@ func handle_quiz(file: String, random: Int) -> Void {
               print("\(white)\(question)")
               print("")
               switch random {
-                case 1: 
+                case 1, 2: 
                   var r_answer  = [String]()
                   var r_correct = [String]()
                   for choice in choices {
                     let number: Int = 65 + counter
-                    let letter = String(format: "%c", number) as String
-                    let value  = String(choice).unicodeScalars.first?.value
+                    var t_string = String()
+                    let letter   = String(format: "%c", number) as String
+                    let value    = String(choice).unicodeScalars.first?.value
                     var count: Int = Int(value!)
                     count       = count - 95
                     var string  = fields[count]
                     let c_array = Array(t_answer.characters)
                     if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
-                      for temp in c_array {
-                        if String(temp).lowercased() == String(choice).lowercased() {
-                          r_answer.append(String(letter).lowercased())
-                          var r_string = "\(letter) \(string)"
-                          r_string     = wrap_text(text: r_string, indent: "   ")
-                          r_correct.append(r_string)
+                      if c_array.contains(Character(choice.lowercased())) {
+                        r_answer.append(letter.lowercased())
+                        var r_string = "\(letter) \(string)"
+                        r_string     = wrap_text(text: r_string, indent: "   ")
+                        t_string     = string
+                        r_correct.append(r_string)
+                      }
+                      else {
+                        if random == 2 {
+                          var c_string = String()
+                          var c_check  = 1
+                          while c_check == 1 {
+                            c_string = q_mix.sample()
+                             if fields.contains(c_string) {
+                               c_check = 1
+                             }
+                             else {
+                               c_check = 0
+                             }
+                          }
+                          t_string = c_string
+                        }
+                        else {
+                          t_string = string
                         }
                       }
-                      string = wrap_text(text: string, indent: "   ")
-                      print("\(letter): \(string)")
+                      string = wrap_text(text: t_string, indent: "   ")
+                      print("\(letter): \(t_string)")
                       counter = counter + 1
                     }
                   }
-                  r_answer    = r_answer.sorted { $0 < $1 }
-                  answer  = r_answer.map({String(describing: $0)}).joined(separator: "")
-                  correct = r_correct.map({String(describing: $0)}).joined(separator: "")
+                  r_answer = r_answer.sorted { $0 < $1 }
+                  answer   = r_answer.map({String(describing: $0)}).joined(separator: "")
+                  correct  = r_correct.map({String(describing: $0)}).joined(separator: "")
                 default:
                   for choice in choices {
                     let upper = String(choice).uppercased()
