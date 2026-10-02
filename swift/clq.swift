@@ -1,10 +1,10 @@
 #!/usr/bin/env xcrun swift
 
 // Name:         clq (Command Line Quiz)
-// Version:      0.0.5
+// Version:      0.1.1
 // Release:      1
-// License:      CC-BA (Creative Commons By Attribution)
-//               http://creativecommons.org/licenses/by/4.0/legalcode
+// License:      CC BY-NC-SA (Creative Commons Attribution-NonCommercial-ShareAlike 4.0)
+//               http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 // Group:        System
 // Source:       N/A
 // URL:          http://lateralblast.com.au/
@@ -55,7 +55,7 @@ func print_usage(file: String) -> Void {
   let lines = file_to_array(file: file)
   for line in lines {
     if var _ = line.range(of: "-[a-z,A-Z]", options: .regularExpression) {
-      if line.range(of: "License|regularExpression", options: .regularExpression) == nil {
+      if line.range(of: "License|legalcode|regularExpression", options: .regularExpression) == nil {
         var output = line.replacingOccurrences(of: "case", with: "")
         output     = output.replacingOccurrences(of: "// ", with: "")
         output     = output.replacingOccurrences(of: "^\\s+", with: "", options: .regularExpression)
@@ -82,11 +82,11 @@ func print_version(file: String) -> Void {
 func list_quizes() -> Void {
   print("Available quizes:")
   let fd = FileManager.default
-  fd.enumerator(atPath: "quizes")?.forEach({ (e) in
-    if let e = e as? String, let url = URL(string: e) {
-        print(url)
+  if let items = try? fd.contentsOfDirectory(atPath: "quizes") {
+    for item in items.sorted() {
+      print(item)
     }
-  })
+  }
   exit(0)
 }
 
@@ -151,18 +151,20 @@ func handle_quiz(file: String, random: Int) -> Void {
     print("")
     exit(0)
   }  
-  var choices  = [ "a", "b", "c", "d", "e" ]
+  let base_choices = [ "a", "b", "c", "d", "e" ]
   let f_nos    = [ 2, 3, 4, 5, 6 ]
   var q_mix    = [String]()
   if random > 0 {
-    choices = choices.shuffled()
-    lines   = lines.shuffled()
+    lines = lines.shuffled()
   }
   if random == 2 {
     for line in lines {
       if line.characters.count > 0 {
         if var _ = line.range(of: "|", options: .regularExpression) {
           if let fields = line.components(separatedBy: "|") as [String]? {
+            if fields.count < 7 {
+              continue
+            }
             if let question = fields[0] as String? {
               if question != "Question" {
                 for f_no in f_nos {
@@ -182,8 +184,12 @@ func handle_quiz(file: String, random: Int) -> Void {
     if line.characters.count > 0 {
       if var _ = line.range(of: "|", options: .regularExpression) {
         if let fields = line.components(separatedBy: "|") as [String]? {
+          if fields.count < 7 {
+            continue
+          }
           if var question = fields[0] as String? {
             if question != "Question" {
+              let choices  = random > 0 ? base_choices.shuffled() : base_choices
               var correct  = String()
               var answer   = String()
               var counter  = 0
@@ -197,6 +203,9 @@ func handle_quiz(file: String, random: Int) -> Void {
                 let value = String(letter).unicodeScalars.first?.value
                 var count: Int = Int(value!)
                 count      = count - 95
+                if count < 2 || count >= fields.count {
+                  continue
+                }
                 var string = fields[count]
                 string     = "\(upper): \(string)"
                 string     = wrap_text(text: string, indent: "   ")
@@ -222,23 +231,17 @@ func handle_quiz(file: String, random: Int) -> Void {
                     if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
                       if c_array.contains(Character(choice.lowercased())) {
                         r_answer.append(letter.lowercased())
-                        var r_string = "\(letter) \(string)"
+                        var r_string = "\(letter): \(string)"
                         r_string     = wrap_text(text: r_string, indent: "   ")
                         t_string     = string
                         r_correct.append(r_string)
                       }
                       else {
                         if random == 2 {
-                          var c_string = String()
-                          var c_check  = 1
-                          while c_check == 1 {
-                            c_string = q_mix.sample()
-                             if fields.contains(c_string) {
-                               c_check = 1
-                             }
-                             else {
-                               c_check = 0
-                             }
+                          let c_choices = q_mix.filter { !fields.contains($0) }
+                          var c_string  = string
+                          if c_choices.count > 0 {
+                            c_string = c_choices.sample()
                           }
                           t_string = c_string
                         }
@@ -316,8 +319,12 @@ switch argument {
     if CommandLine.arguments.count > 2 {
       var quiz   = CommandLine.arguments[2]
       var random = 0
-      if quiz.range(of: "quizes/", options: .regularExpression) == nil {
+      if !FileManager.default.fileExists(atPath: quiz) {
         quiz = "quizes/\(quiz)"
+      }
+      if !FileManager.default.fileExists(atPath: quiz) {
+        print("Quiz \(CommandLine.arguments[2]) does not exist")
+        exit(1)
       }
       if CommandLine.arguments.count == 4 {
         let mode = CommandLine.arguments[3] 

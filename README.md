@@ -10,9 +10,13 @@ Introduction
 
 A simple shell and ruby script that converts a formatted CSV file into a multiple choice quiz.
 
-Shell script: clq.sh
+Shell script: shell/clq.sh
 
-Ruby script: clq.rb
+Ruby script: ruby/clq.rb
+
+Swift script: swift/clq.swift (macOS only)
+
+Run the scripts from the repository root so the `quizes` directory is found.
 
 Supported Operating Systems
 ---------------------------
@@ -22,9 +26,9 @@ Any operating system with sh/bash or ruby
 License
 -------
 
-This software is licensed as CC-BA (Creative Commons By Attrbution)
+This software is licensed as CC BY-NC-SA 4.0 (Creative Commons Attribution-NonCommercial-ShareAlike). See the LICENSE file.
 
-http://creativecommons.org/licenses/by/4.0/legalcode
+https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 Features
 --------
@@ -48,9 +52,9 @@ Shell Script Usage Information
 Get help:
 
 ```
-$ ./clq.sh -h
+$ ./shell/clq.sh -h
 
-Usage: ./clq.sh -[h|V|q] [quiz]
+Usage: ./shell/clq.sh -[h|V|q] [quiz]
 
 -h:        Print usage
 -V:        Print version
@@ -61,7 +65,7 @@ Usage: ./clq.sh -[h|V|q] [quiz]
 List available quizes:
 
 ```
-$ ./clq.sh -l
+$ ./shell/clq.sh -l
 Available quizes:
 example
 ```
@@ -69,24 +73,32 @@ example
 Do the multiple choice quiz example:
 
 ```
-$ ./clq.sh -q example
+$ ./shell/clq.sh -q example
 ```
 
 Ask questions in random order:
 
 ```
-$ ./clq.sh -r example
+$ ./shell/clq.sh -r example
 ```
 
 Ruby Script Usage Information
 -----------------------------
 
+The Ruby script needs the gems listed in `ruby/Gemfile` (getopt, smarter_csv, colorize).
+It installs them itself if missing, or install them with Bundler:
+
+```
+$ bundle install --gemfile=ruby/Gemfile
+$ BUNDLE_GEMFILE=ruby/Gemfile bundle exec ruby ruby/clq.rb -q example
+```
+
 Get help:
 
 ```
-$ ./clq.rb -h
+$ ./ruby/clq.rb -h
 
-Usage: ./clq.rb
+Usage: ./ruby/clq.rb
 
 "--list",     "-l"  List quizes
 "--random",   "-r"  Randomise quizes
@@ -99,7 +111,7 @@ Usage: ./clq.rb
 List available quizes:
 
 ```
-$ ./clq.rb -l
+$ ./ruby/clq.rb -l
 Available quizes:
 example
 ```
@@ -107,19 +119,19 @@ example
 Do the multiple choice quiz example:
 
 ```
-$ ./clq.rb -q example
+$ ./ruby/clq.rb -q example
 ```
 
 Ask questions in random order:
 
 ```
-$ ./clq.rb -q example -r
+$ ./ruby/clq.rb -q example -r
 ```
 
 Ask questions in random order and mix choices between questions
 
 ```
-$ ./clq.rb -q example -r -m
+$ ./ruby/clq.rb -q example -r -m
 ```
 
 Question File Information
@@ -157,7 +169,7 @@ Examples
 List available quizes:
 
 ```
-$ ./clq.sh -l
+$ ./shell/clq.sh -l
 Available quizes:
 example
 ```
@@ -165,7 +177,7 @@ example
 Do the multiple choice quiz example in random order and mix choices amongst questions:
 
 ```
-$ ./clq.rb -q example -m -r
+$ ./ruby/clq.rb -q example -m -r
 
 Your web application front end consists of multiple EC2 instances behind an
 Elastic Load Balancer. You configured ELB to perform health checks on these EC2

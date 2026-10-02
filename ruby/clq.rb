@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
 # Name:         clq (Command Line Quiz)
-# Version:      0.0.9
+# Version:      0.1.5
 # Release:      1
-# License:      CC-BA (Creative Commons By Attribution)
-#               http://creativecommons.org/licenses/by/4.0/legalcode
+# License:      CC BY-NC-SA (Creative Commons Attribution-NonCommercial-ShareAlike 4.0)
+#               http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 # Group:        System
 # Source:       N/A
 # URL:          http://lateralblast.com.au/
@@ -110,6 +110,7 @@ end
 
 if !ARGV[0]
   print_usage()
+  exit 1
 end
 
 # List quizes
@@ -142,6 +143,7 @@ end
 # Handle quizes
 
 def handle_quiz(quiz_file,random,mix)
+  letters  = [ 'a', 'b', 'c', 'd', 'e' ]
   no_right = 0
   no_wrong = 0
   no_quest = 0
@@ -149,7 +151,7 @@ def handle_quiz(quiz_file,random,mix)
     test_file = $quiz_dir+"/"+quiz_file
     if !File.exist?(test_file)
       puts "Quiz "+quiz_file+" does not exist"
-      exit
+      exit 1
     else
       quiz_file = test_file
     end
@@ -158,117 +160,74 @@ def handle_quiz(quiz_file,random,mix)
   if random == true
     quiz_data = quiz_data.shuffle
   end
+  q_mix = []
   if mix == true
-    q_mix = []
-    quiz_data.each do |key, value|
-      [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
-        q_mix.push(key[:"#{letter}"])
+    quiz_data.each do |key|
+      letters.each do |letter|
+        q_mix.push(key[letter.to_sym]) if key[letter.to_sym]
       end
     end
+    q_mix.uniq!
   end
-  quiz_data.each do |key, value|
-    r_correct = []
-    answer    = ""
-    text      = ""
-    correct   = key[:answer].downcase.gsub(/,| /,"").chars.sort.join
-    question  = key[:question]
-    question  = question.wrap_text
-    puts
-    puts question
-    puts
-    if random == true
-      counter = 0
-      [ 'a', 'b', 'c', 'd', 'e' ].shuffle.each do |letter|
-        if key[:"#{letter}"]
-          choice  = "a".ord+counter
-          choice  = choice.chr
-          counter = counter + 1
-          line    = ""
-          test = 0
-          line = ""
-          text = ""
-          if correct.match(/#{letter}/)
-            r_correct.push(choice)
-            if answer.length < 1
-              answer = choice.upcase+": "+key[:"#{letter}"]
-            else
-              answer = answer+"\n"+choice.upcase+": "+key[:"#{letter}"]
-            end
-            line = choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
-          else
-            if mix == true
-              text = q_mix.sample
-              while test == 0
-                test = 1
-                text = q_mix.sample
-                correct.split("").each do |sample|
-                  if key[:"#{sample}"].match(/#{text}/) or key[:"#{letter}"].match(/#{text}/) or key[:"#{choice}"].match(/#{text}/)
-                    test = 0
-                  end
-                end
-              end
-              line = choice.upcase.bold+": "+text.wrap_text_with_indent
-            else 
-              line = choice.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
-            end
-          end
-          puts line
-        end
-      end
-      correct = r_correct.join
-    else
-      [ 'a', 'b', 'c', 'd', 'e' ].each do |letter|
-        test = 0
-        line = ""
-        text = ""
-        if key[:"#{letter}"]
-          if correct.match(/#{letter}/)
-            if answer.length < 1
-              answer = letter.upcase+": "+key[:"#{letter}"]
-            else
-              answer = answer+"\n"+letter.upcase+": "+key[:"#{letter}"]
-            end
-            line = letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
-          else
-            if mix == true
-              text = q_mix.sample
-              while test == 0
-                test = 1
-                text = q_mix.sample
-                correct.split("").each do |sample|
-                  if key[:"#{sample}"].match(/#{text}/) or key[:"#{letter}"].match(/#{text}/)
-                    test = 0
-                  end
-                end
-              end
-              line = letter.upcase.bold+": "+text.wrap_text_with_indent
-            else
-              line = letter.upcase.bold+": "+key[:"#{letter}"].wrap_text_with_indent
-            end
-          end
-          puts line
-        end
-      end
+  quiz_data.each do |key|
+    if !key[:answer] or !key[:question]
+      puts "Skipping question with missing question or answer"
+      next
     end
+    available = letters.select { |letter| key[letter.to_sym] }
+    correct   = key[:answer].to_s.downcase.gsub(/,| /,"").chars.sort & available
+    if correct.empty?
+      puts "Skipping question with no valid answer: "+key[:question].to_s
+      next
+    end
+    order     = available
+    if random == true
+      order = available.shuffle
+    end
+    puts
+    puts key[:question].to_s.wrap_text
+    puts
+    shown     = []
+    answers   = []
+    r_correct = []
+    labels    = []
+    order.each_with_index do |letter,counter|
+      label = ("a".ord+counter).chr
+      labels.push(label)
+      text  = key[letter.to_sym].to_s
+      if correct.include?(letter)
+        r_correct.push(label)
+        answers.push([ label, text ])
+      elsif mix == true
+        own        = available.map { |l| key[l.to_sym] }
+        candidates = q_mix.reject { |t| own.include?(t) or shown.include?(t) }
+        text       = candidates.sample if !candidates.empty?
+      end
+      shown.push(text)
+      puts label.upcase.bold+": "+text.wrap_text_with_indent
+    end
+    correct = r_correct.sort
+    answer  = answers.sort.map { |label,text| label.upcase+": "+text }.join("\n")
     puts
     print "Answer? "
-    response = ""
+    response = []
     while response.length < correct.length
-      input = STDIN.getch.chomp.downcase.gsub(/,| /,"").chars.sort.join
-      print input
-      if input.match(/q/)
+      input = STDIN.getch.downcase
+      if input == "q" or input == "\u0003"
+        puts
         print_results(no_quest,no_right,no_wrong)
         exit
       end
-      if input.match(/[a-e]/)
-        response = response+input
+      if labels.include?(input) and !response.include?(input)
+        response.push(input)
+        print input
       end
     end
     puts
     puts
-    answer = answer.wrap_text
+    answer   = answer.wrap_text
     no_quest = no_quest + 1
-    if response == correct
+    if response.sort == correct
       no_right = no_right + 1
       puts answer.green
     else
@@ -302,10 +261,12 @@ end
 
 if option["h"]
   print_usage()
+  exit
 end
 
 if option["V"]
   print_version()
+  exit
 end
 
 # Ask questions in random order
