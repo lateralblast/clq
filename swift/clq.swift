@@ -1,7 +1,7 @@
-#!/usr/bin/env xcrun swift
+#!/usr/bin/env swift
 
 // Name:         clq (Command Line Quiz)
-// Version:      0.1.1
+// Version:      0.1.3
 // Release:      1
 // License:      CC BY-NC-SA (Creative Commons Attribution-NonCommercial-ShareAlike 4.0)
 //               http://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
@@ -13,7 +13,11 @@
 // Packager:     Richard Spindler <richard@lateralblast.com.au>
 // Description:  A POC swift code to turn a formatted csv file into multiple choice quiz
 
+#if canImport(Darwin)
 import Darwin
+#else
+import Glibc
+#endif
 import Foundation
 
 extension Array {
@@ -95,7 +99,7 @@ func wrap_text(text: String, indent: String) -> String {
   let fields = text.components(separatedBy: " ")
   var array  = [String]()
   for field in fields {
-    let length = field.characters.count
+    let length = field.count
     if count + length < 80 {
       array.append("\(field) ")
       count = count + length
@@ -111,7 +115,7 @@ func wrap_text(text: String, indent: String) -> String {
 
 func sort_answer(text: String) -> String {
   var result = text.replacingOccurrences(of: " |,", with: "", options: .regularExpression)
-  var array  = Array(result.characters)
+  var array  = Array(result)
   array      = array.sorted { $0 < $1 }
   result     = array.map({String(describing: $0)}).joined(separator: "")
   return result
@@ -159,7 +163,7 @@ func handle_quiz(file: String, random: Int) -> Void {
   }
   if random == 2 {
     for line in lines {
-      if line.characters.count > 0 {
+      if line.count > 0 {
         if var _ = line.range(of: "|", options: .regularExpression) {
           if let fields = line.components(separatedBy: "|") as [String]? {
             if fields.count < 7 {
@@ -181,7 +185,7 @@ func handle_quiz(file: String, random: Int) -> Void {
     }
   }
   for line in lines {
-    if line.characters.count > 0 {
+    if line.count > 0 {
       if var _ = line.range(of: "|", options: .regularExpression) {
         if let fields = line.components(separatedBy: "|") as [String]? {
           if fields.count < 7 {
@@ -197,7 +201,7 @@ func handle_quiz(file: String, random: Int) -> Void {
               t_answer     = sort_answer(text: t_answer)
               t_answer     = t_answer.lowercased()
               var array    = [String]()
-              let letters  = Array(t_answer.characters)
+              let letters  = Array(t_answer)
               for letter in letters {
                 let upper = String(letter).uppercased()
                 let value = String(letter).unicodeScalars.first?.value
@@ -227,7 +231,7 @@ func handle_quiz(file: String, random: Int) -> Void {
                     var count: Int = Int(value!)
                     count       = count - 95
                     var string  = fields[count]
-                    let c_array = Array(t_answer.characters)
+                    let c_array = Array(t_answer)
                     if var _ = string.range(of: "[A-Z,a-z,0-9]", options: .regularExpression) {
                       if c_array.contains(Character(choice.lowercased())) {
                         r_answer.append(letter.lowercased())

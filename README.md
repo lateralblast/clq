@@ -16,7 +16,7 @@ Ruby script: ruby/clq.rb
 
 Python script: python/clq.py (Python 3, no dependencies; see python/requirements.txt)
 
-Swift script: swift/clq.swift (macOS only)
+Swift script: swift/clq.swift (macOS and Linux)
 
 Run the scripts from the repository root so the `quizes` directory is found.
 
