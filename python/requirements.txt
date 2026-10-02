@@ -1,2 +1,5 @@
-# clq.py uses only the Python 3 standard library, so there are no
-# third party packages to install. Add future dependencies below.
+# clq.py needs only the Python 3 standard library for csv and json quizes.
+# PyYAML is optional and only needed for yaml quizes (.yaml or .yml).
+PyYAML>=6.0
+# zstandard is optional: only needed to read new format Anki .apkg files on Python older than 3.14.
+# zstandard>=0.22

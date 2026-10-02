@@ -139,11 +139,49 @@ $ ./ruby/clq.rb -q example -r -m
 Python Script Usage Information
 ------------------------------
 
-Same options as the Ruby script:
+Same options as the Ruby script (`-l`, `-q`, `-r`, `-m`, `-V`), plus:
 
 ```
-$ ./python/clq.py -q example -r -m
+-n N          Only ask N questions
+-w            Only ask questions last answered wrongly
+-H [quiz]     Show saved results history
+-i DECK       Import an Anki deck as a JSON quiz
+--reverse     Anki decks: ask the back, answer the front
+--no-retry    Do not offer to retry missed questions
+--no-save     Do not record results in the history file
 ```
+
+```
+$ ./python/clq.py -q example -r -m -n 10
+$ ./python/clq.py -q example -w
+$ ./python/clq.py -H example
+```
+
+Results are saved to `~/.local/share/clq/history.json` (override with `CLQ_HISTORY`).
+After a round, the script offers to retry the questions you missed.
+
+An optional `Explanation` column after `E` in a CSV quiz is shown after each answer
+(see `quizes/example-explained`). Quizes can also be JSON (see `quizes/example.json`)
+or YAML, which needs `pip install -r python/requirements.txt`. Each question has
+`question`, `answer` (`"b"` or `["b", "c"]`), `choices` (a list in A-E order or a
+mapping) and an optional `explanation`.
+
+Anki decks can be used directly, or imported as a quiz:
+
+```
+$ ./python/clq.py -q mydeck.apkg -r -n 20
+$ ./python/clq.py -i mydeck.apkg        # writes quizes/mydeck.json
+$ ./python/clq.py -q mydeck.apkg --reverse
+```
+
+Both `.apkg` packages and Anki plain text exports (`.txt`, tab separated by default)
+are supported. Flashcards have no wrong answers, so each card becomes a question with
+its back as the answer and the backs of other cards as the wrong choices. `--reverse`
+asks the back and answers with the front. Cloze and other non front/back notes are
+skipped. Media is ignored. New format packages are zstd compressed, which needs
+Python 3.14 or `pip install zstandard`, or export with "Support older Anki versions".
+
+Run the tests with `python3 python/test_clq.py`.
 
 Question File Information
 -------------------------
@@ -260,3 +298,10 @@ Correct:   3
 Wrong:     0
 Percent:   100.0%
 ```
+
+Help Support Development
+------------------------
+
+If you find this software useful and would like to support its development, please consider buying me a coffee:
+
+https://ko-fi.com/richardatlateralblast
