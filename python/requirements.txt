@@ -1,0 +1,2 @@
+# clq.py uses only the Python 3 standard library, so there are no
+# third party packages to install. Add future dependencies below.

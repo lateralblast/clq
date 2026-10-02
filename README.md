@@ -14,7 +14,7 @@ Shell script: shell/clq.sh
 
 Ruby script: ruby/clq.rb
 
-Python script: python/clq.py (Python 3, no dependencies)
+Python script: python/clq.py (Python 3, no dependencies; see python/requirements.txt)
 
 Swift script: swift/clq.swift (macOS only)
 
