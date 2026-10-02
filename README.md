@@ -14,6 +14,8 @@ Shell script: shell/clq.sh
 
 Ruby script: ruby/clq.rb
 
+Python script: python/clq.py (Python 3, no dependencies)
+
 Swift script: swift/clq.swift (macOS only)
 
 Run the scripts from the repository root so the `quizes` directory is found.
@@ -132,6 +134,15 @@ Ask questions in random order and mix choices between questions
 
 ```
 $ ./ruby/clq.rb -q example -r -m
+```
+
+Python Script Usage Information
+------------------------------
+
+Same options as the Ruby script:
+
+```
+$ ./python/clq.py -q example -r -m
 ```
 
 Question File Information
